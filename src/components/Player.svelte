@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { Player } from '../lib/player';
 	import {
 		forceHighlightRelations,
@@ -7,6 +8,14 @@
 		setPlayerPosition,
 		unhighlightRelations
 	} from '../lib/store';
+
+	let isMobile = false;
+
+	onMount(() => {
+		isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+			window.navigator.userAgent
+		);
+	});
 
 	export let player: Player;
 </script>
@@ -21,11 +30,34 @@
 	style:left="{player.x}px"
 	style:top="{player.y}px"
 	style:opacity={player.opacity}
-	on:dblclick={(e) => {
+	on:dblclick={() => {
 		resetPlayerPositionByRotation(player);
 	}}
-	on:dragstart={function (e) {
-		if ('ontouchstart' in document.documentElement) {
+	on:click={(e) => {
+		if (isMobile) {
+			return;
+		}
+
+		highlightRelations(player.rotationPosition);
+	}}
+	on:touchstart={() => {
+		forceHighlightRelations(player.rotationPosition);
+	}}
+	on:touchend={() => {
+		unhighlightRelations();
+	}}
+	on:touchmove={(e) => {
+		e.preventDefault();
+		player.opacity = 1;
+		const [target] = e.targetTouches;
+		const rect = e.currentTarget.parentElement?.getBoundingClientRect();
+		if (!rect) return;
+		const x = target.clientX - rect.x - player.r;
+		const y = target.clientY - rect.y - player.r;
+		setPlayerPosition(player, { x, y });
+	}}
+	on:dragstart={(e) => {
+		if (isMobile) {
 			e.preventDefault();
 			return;
 		}
@@ -33,39 +65,16 @@
 		player.opacity = 0.3;
 		forceHighlightRelations(player.rotationPosition);
 	}}
-	on:dragend={function (e) {
-		if ('ontouchstart' in document.documentElement) {
+	on:dragend={(e) => {
+		if (isMobile) {
 			e.preventDefault();
 			return;
 		}
-
 		player.opacity = 1;
-		const x = player.x - e.offsetX - player.r;
-		const y = player.y - e.offsetY - player.r;
-
+		const x = player.x + e.offsetX - player.r;
+		const y = player.y + e.offsetY - player.r;
 		setPlayerPosition(player, { x, y });
 		unhighlightRelations();
-	}}
-	on:click={() => {
-		highlightRelations(player.rotationPosition);
-	}}
-	on:touchstart={function (e) {
-		forceHighlightRelations(player.rotationPosition);
-	}}
-	on:touchend={unhighlightRelations}
-	on:touchmove={function (e) {
-		e.preventDefault();
-		player.opacity = 1;
-
-		const [target] = e.targetTouches;
-		const rect = e.currentTarget.parentElement?.getBoundingClientRect();
-
-		if (!rect) return;
-
-		const x = target.clientX - rect.x - player.r;
-		const y = target.clientY - rect.y - player.r;
-
-		setPlayerPosition(player, { x, y });
 	}}
 >
 	{player.rotationPosition}
