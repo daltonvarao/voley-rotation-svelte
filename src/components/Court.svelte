@@ -1,29 +1,13 @@
 <script lang="ts">
-	import playerStore, { players } from '../lib/store';
-	import PlayerComponent from './Player.svelte';
-
-	players.subscribe((state) => {
-		console.log({ state });
-		state.forEach((p) => p.validate(state));
-	});
+	import { store } from '$lib/store';
+	import Player from '@components/Player.svelte';
 </script>
 
-<div id="control-panel">
-	<button on:click={() => playerStore.rotatePlayersOnePosition()}>Rodar</button>
-	<button>Resetar Infiltração</button>
-	<button>Posição inicial</button>
-	<!-- <button> &#9881;</button> -->
+<div id="court">
+	{#each $store.players as player}
+		<Player {player} />
+	{/each}
 </div>
-
-{#if !$players.length}
-	<div id="court" />
-{:else}
-	<div id="court">
-		{#each $players as player}
-			<PlayerComponent {player} />
-		{/each}
-	</div>
-{/if}
 
 <style>
 	#court {
@@ -32,20 +16,15 @@
 		background: #ee786a;
 		border: 6px solid white;
 		position: relative;
+		z-index: 100;
 	}
 
-	button {
-		background: white;
-		padding: 4px;
-		border: 0;
-		border-radius: 4px;
-	}
-
-	button:hover {
-		cursor: pointer;
-	}
-
-	#control-panel {
-		margin-bottom: 2rem;
+	#court::before {
+		content: '';
+		border-top: 6px solid white;
+		top: 125px;
+		left: 0px;
+		width: 100%;
+		position: absolute;
 	}
 </style>

@@ -1,7 +1,7 @@
-import type { Position2D, RotationPosition } from './type';
+import type { Position2D } from './type';
 
 const POSITIONS_BY_ROTATION: {
-	rotationPosition: RotationPosition;
+	rotationPosition: number;
 	position: Position2D;
 }[] = [
 	{ rotationPosition: 1, position: { x: 280, y: 260 } },
@@ -12,7 +12,7 @@ const POSITIONS_BY_ROTATION: {
 	{ rotationPosition: 6, position: { x: 155, y: 260 } }
 ];
 
-export const PositionsByRotationMap = new Map<RotationPosition, Position2D>();
+export const PositionsByRotationMap = new Map<number, Position2D>();
 
 POSITIONS_BY_ROTATION.map((pos) => {
 	PositionsByRotationMap.set(pos.rotationPosition, pos.position);

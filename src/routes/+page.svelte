@@ -1,6 +1,10 @@
 <script>
+	import ControlPanel from '@components/ControlPanel.svelte';
+	import Court from '@components/Court.svelte';
+	import Footer from '@components/Footer.svelte';
+	import Header from '@components/Header.svelte';
+
 	import { onMount } from 'svelte';
-	import Court from '../components/Court.svelte';
 
 	onMount(() => {
 		document.body.ondragover = function (ev) {
@@ -10,7 +14,10 @@
 </script>
 
 <div id="app">
+	<Header />
+	<ControlPanel />
 	<Court />
+	<Footer />
 </div>
 
 <style>
