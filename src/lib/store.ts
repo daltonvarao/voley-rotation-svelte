@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import { PositionsByRotationMap } from './constants';
 import type { Player } from './player';
@@ -10,15 +11,33 @@ interface Store {
 }
 
 export const store = writable<Store>({
-	players: [
-		buildPlayer('levantador', 1),
-		buildPlayer('ponteiro1', 2),
-		buildPlayer('central', 3),
-		buildPlayer('oposto', 4),
-		buildPlayer('ponteiro2', 5),
-		buildPlayer('central2', 6)
-	]
+	players: []
 });
+
+if (browser) {
+	const storedData: Store = JSON.parse(localStorage.store ?? '{}');
+
+	if (storedData.players?.length) {
+		store.set(storedData);
+	} else {
+		store.set({
+			players: [
+				buildPlayer('levantador', 1),
+				buildPlayer('ponteiro1', 2),
+				buildPlayer('central', 3),
+				buildPlayer('oposto', 4),
+				buildPlayer('ponteiro2', 5),
+				buildPlayer('central2', 6)
+			]
+		});
+	}
+}
+
+export const listenToStoreUpdates = () => {
+	store.subscribe((state) => {
+		localStorage.store = JSON.stringify(state);
+	});
+};
 
 export const updatePlayerByRotationPosition = (
 	rotationPosition: number,

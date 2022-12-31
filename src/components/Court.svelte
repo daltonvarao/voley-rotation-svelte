@@ -1,12 +1,19 @@
 <script lang="ts">
-	import { store } from '$lib/store';
+	import { listenToStoreUpdates, store } from '$lib/store';
 	import Player from '@components/Player.svelte';
+	import { onMount } from 'svelte';
+
+	onMount(() => {
+		listenToStoreUpdates();
+	});
 </script>
 
 <div id="court">
-	{#each $store.players as player}
-		<Player {player} />
-	{/each}
+	{#if $store.players.length}
+		{#each $store.players as player}
+			<Player {player} />
+		{/each}
+	{/if}
 </div>
 
 <style>
